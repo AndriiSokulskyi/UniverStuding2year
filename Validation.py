@@ -1,114 +1,138 @@
 from datetime import date
 
-class Validation:
 
-    @staticmethod
-    def dig_valid(num):
+def dig_valid(func):
+    def func_wrapper(self, num):
         if num != None:
             if (num.isdigit() == False):
-                print ('It must be only numbers')
-                return 'Incorect'
-            else:
-                return num
+                print('It must be only numbers')
+                num = 'Incorect'
+            res = func(self, num)
+            return res
+    return func_wrapper
 
-    @staticmethod
-    def id_valid(id):
+
+def id_valid(func):
+    @dig_valid
+    def func_wrapper(self, id):
         if id != None:
-            id = Validation.dig_valid(id)
-            if (len(id) == 8):
-                return id
-            else:
+            if (len(id) != 8):
                 print('It must be ID')
-                return 'Incorect'
+                id = 'Incorect'
+            res = func(self, id)
+            return res
+    return func_wrapper
 
-    @staticmethod
-    def alfa_valid(alfa):
+
+def alfa_valid(func):
+    def func_wrapper(self, alfa):
         if alfa != None:
             if (alfa.isalpha() == False):
                 print ('It must be only letterts')
-                return 'Incorect'
-            else:
-                return alfa
+                alfa = 'Incorect'
+            res = func(self, alfa)
+            return res
+    return func_wrapper
 
-    @staticmethod
-    def cc_valid(country_code):
+
+def cc_valid(func):
+    @alfa_valid
+    def func_wrapper(self, country_code):
         if country_code != None:
-            if country_code.islower() & (len(country_code) < 4): # All country codes have max 3 letters( I`ve googled) )
-                return Validation.alfa_valid(country_code)
-            else:
+            if not (country_code.islower() | (
+                    len(country_code) < 4)):  # All country codes have max 3 letters( I`ve googled) )
                 print('It must be country code (small letters, less then 4)')
-                return 'Incorect'
+                country_code = 'Incorect'
+            res = func(self, country_code)
+            return res
+    return func_wrapper
 
-    @staticmethod
-    def pn_valid(passport_no):
+
+def pn_valid(func):
+    def func_wrapper(self, passport_no):
         if passport_no != None:
-            if (len(passport_no) == 8) & passport_no[0:2].isupper() & passport_no[2:8].isdigit():
-                return passport_no
-            else:
+            if not((len(passport_no) == 8) | passport_no[0:2].isupper() | passport_no[2:8].isdigit()):
                 print('It must be passport № (First two - big letters, next 6 digits)')
-                return 'Incorect'
+                passport_no = 'Incorect'
+            res = func(self, passport_no)
+            return res
+    return func_wrapper
 
-    @staticmethod
-    def date_valid(date):
+
+def date_valid(func):
+    def func_wrapper(self, date, date2):
         if date != None:
             if (len(date) == 10) & date[0:4].isdigit() & date[5:7].isdigit() & date[8:10].isdigit() & (date[4] == '-') & (date[7] == '-'):
                 if (0 < int(date[5:7]) < 13) & (0 < int(date[8:10]) < 32):
                     if (date[5:7] == '02') & (int(date[8:10]) > 29):
                         print('Feb has max 29 days.')
-                        return 'Incorect'
+                        date = 'Incorect'
                     elif (date[5:7] == '02') & (int(date[8:10]) > 28) & (int(date[0:4])%4 != 0):
                         print('Feb has 28 days, when year is not intercalary.')
-                        return 'Incorect'
+                        date = 'Incorect'
                     elif ( date[5:7] == '04' or date[5:7] == '06' or date[5:7] == '09' or date[5:7] =='11' ) & ( int(date[8:10]) > 30 ):
                         print('Apl, Jun, Sep and Nov have max 29 days.')
-                        return 'Incorect'
-                    else:
-                        return date
+                        date = 'Incorect'
                 else:
                     print('Month has max 31 days and year has max 12 month')
-                    return 'Incorect'
+                    date = 'Incorect'
             else:
                 print('It must be date (xx.xx.xxxx)')
-                return 'Incorect'
+                date = 'Incorect'
+            res = func(self, date, date2)
+            return res
+    return func_wrapper
 
-    @staticmethod
-    def birth_valid(date_of_birth):
+
+def birth_valid(func):
+    def func_wrapper(self, date_of_birth, date2):
         if date_of_birth != None:
-            if str(date.today()) > date_of_birth > '1900-01-01':
-                return Validation.date_valid(date_of_birth)
-            else:
+            if (str(date.today()) < date_of_birth) | (date_of_birth < '1900-01-01'):
                 print('This person is unborned or dead')
-                return 'Incorect'
+                date_of_birth = 'Incorect'
+            res = func(self, date_of_birth, date2)
+            return res
+    return func_wrapper
 
-    @staticmethod
-    def issue_valid(date_of_issue, date_of_birth):
-        if (date_of_issue!= None) & (date_of_birth != None):
-            if str(date.today()) > date_of_issue > date_of_birth:
-                return Validation.date_valid(date_of_issue)
-            else:
+
+def issue_valid(func):
+    def func_wrapper(self, date_of_issue, date_of_birth):
+        if date_of_issue != None:
+            if (str(date.today()) < date_of_issue) | (date_of_issue < date_of_birth):
                 print('This person can`t get forirgn passport before birth or in future')
-                return 'Incorect'
+                date_of_issue = 'Incorect'
+            res = func(self, date_of_issue, date_of_birth)
+            return res
+    return func_wrapper
 
-    @staticmethod
-    def expire_valid(date_of_expire, date_of_issue):
-        if (date_of_issue!= None) & (date_of_expire != None):
-            if date_of_expire > date_of_issue:
-                return Validation.date_valid(date_of_expire)
-            else:
+
+def expire_valid(func):
+    def func_wrapper(self, date_of_expire, date_of_issue):
+        if (date_of_expire!= None):
+            if date_of_expire < str(date_of_issue):
                 print('Foreign passport can`t be expired before getting')
-                return 'Incorect'
+                date_of_expire = 'Incorect'
+            res = func(self, date_of_expire, date_of_issue)
+            return res
+    return func_wrapper
 
-    @staticmethod
-    def txt_valid(txt):
-        if txt.endswith('.txt'):
-            return txt
-        else:
+
+def txt_valid(func):
+    @file_existing
+    def func_wrapper(txt, mode):
+        if not (txt.endswith('.txt')):
             raise ValueError('It is not txt file.')
+        res = func(txt, mode)
+        return res
+    return func_wrapper
 
-    @staticmethod
-    def file_existing(file, mode = "r"):
+
+def file_existing(func):
+    def func_wrapper(file, mode):
         try:
-            f = open(Validation().txt_valid(file), mode)
+            f = open(file, mode)
         except IOError:
             raise IOError('File don`t exist.')
-        return f
+        res = func(file, mode)
+        return res
+    return func_wrapper

@@ -32,15 +32,14 @@ class Collection:
             f = file.readline().strip('\n')
             if not f:
                 break
-            for i in range(len(dictio)):
-                fid.set(dictio[i], f)
-                f = file.readline().strip('\n')
+= file.readline().strip('\n')
+
             self.add_to_collec(fid)
 
     def add_to_file(self, file):
         for i in self.collec:
             for j in range(len(dictio)):
-                file.write(i.get(dictio[j]))
+
                 file.write('\n')
             file.write('\n')
 
@@ -60,7 +59,7 @@ class Collection:
 
     def edit_collec(self, iDn, ed):
         for i in self.collec:
-            for j in range(len(dictio)):
+
                 if dictio[j] == iDn:
                     getattr(i, dictio1[j])(ed)
 
